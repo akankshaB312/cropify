@@ -1,0 +1,13 @@
+# Maven build directory
+/target/
+# Logs
+*.log
+# Environment files (do not commit secrets)
+.env
+#.env files often used locally
+# IDE files
+.idea/
+*.iml
+*.classpath
+*.project
+.settings/

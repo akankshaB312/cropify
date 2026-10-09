@@ -44,6 +44,31 @@ Create a `.env` file (or configure your environment) with the following keys:
 
 A template is provided as `.env.example`.
 
+### Testing the Database Connection
+Below is a minimal example that attempts to obtain a JDBC connection using the configuration classes.
+```java
+package com.cropyield;
+
+import com.cropyield.config.DBConnection;
+import java.sql.Connection;
+
+public class ConnectionTest {
+    public static void main(String[] args) {
+        try (Connection conn = DBConnection.getConnection()) {
+            System.out.println("Connection successful: " + !conn.isClosed());
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+}
+```
+Compile and run it with Maven (requires the `exec-maven-plugin` configured or run from your IDE):
+```bash
+mvn compile exec:java -Dexec.mainClass="com.cropyield.ConnectionTest"
+```
+Make sure the environment variables `DB_URL`, `DB_USER`, and `DB_PASSWORD` are set in the same process before executing the program.
+
 ### Next Steps (Phase 2)
 - Implement data access objects (DAO) using JDBC.
 - Add service layer to calculate predicted yields.

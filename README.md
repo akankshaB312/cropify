@@ -69,10 +69,24 @@ mvn compile exec:java -Dexec.mainClass="com.cropyield.ConnectionTest"
 ```
 Make sure the environment variables `DB_URL`, `DB_USER`, and `DB_PASSWORD` are set in the same process before executing the program.
 
-### Next Steps (Phase 2)
-- Implement data access objects (DAO) using JDBC.
-- Add service layer to calculate predicted yields.
-- Write unit and integration tests.
+## Prediction Logic & Calculation Module
 
----
-*This README is part of Phase 1 and will be expanded as the project evolves.*
+Responsible for computing estimated crop yields independently of the database layer.
+
+### Core Features
+* **Configurable Base Rates:** Pre-configured average yield rates for **Wheat**, **Rice**, and **Maize** (stored in an easily extensible `Map`).
+* **Input Validation:** Built-in guard clauses that validate land area (> 0), ensure valid crop selection (case-insensitive and trimmed), and enforce acceptable soil quality multiplier bounds ($0.1$ to $2.0$).
+* **Dual-Unit Output:** Encapsulates calculation results (`YieldResult`) providing final harvest estimates in both **kilograms (kg)** and **tonnes**.
+* **Decoupled Architecture:** Fully independent business logic that can be executed and tested via standalone code execution or a `main` verification method without needing a MySQL connection.
+
+### Usage Example
+
+```java
+CropYieldCalculator calculator = new CropYieldCalculator();
+
+// Basic calculation (returns yield in kilograms)
+double wheatKg = calculator.predictYield("wheat", 5.0);
+
+// Detailed calculation with custom environmental/soil multiplier
+CropYieldCalculator.YieldResult result = calculator.calculateDetailedYield("rice", 3.5, 1.2);
+System.out.println(result);

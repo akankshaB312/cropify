@@ -34,13 +34,13 @@ public final class CropRecord {
         this.id = id;
         this.farmerName = Objects.requireNonNull(farmerName, "farmerName must not be null");
         this.cropId = cropId;
-        this.cropName = Objects.requireNonNull(cropName, "cropName must not be null");
+        this.cropName = cropName; // may be null during input; will be set later
         this.landArea = Objects.requireNonNull(landArea, "landArea must not be null");
         this.rainfall = Objects.requireNonNull(rainfall, "rainfall must not be null");
         this.temperature = Objects.requireNonNull(temperature, "temperature must not be null");
         this.soilType = Objects.requireNonNull(soilType, "soilType must not be null");
         this.fertilizer = Objects.requireNonNull(fertilizer, "fertilizer must not be null");
-        this.predictedYield = Objects.requireNonNull(predictedYield, "predictedYield must not be null");
+        this.predictedYield = predictedYield; // may be null; will be set after calculation
         this.createdAt = Objects.requireNonNull(createdAt, "createdAt must not be null");
     }
 

@@ -29,14 +29,36 @@ public class CropDAOIntegrationTest {
     private static final String REQUIRED_PASS = "DB_PASSWORD";
 
     @BeforeAll
-    public void checkEnv() {
-        // Skip all tests if any required env var is missing
-        Assumptions.assumeTrue(System.getenv(REQUIRED_URL) != null && !System.getenv(REQUIRED_URL).isBlank(),
-                "Missing DB_URL – integration tests are disabled");
-        Assumptions.assumeTrue(System.getenv(REQUIRED_USER) != null && !System.getenv(REQUIRED_USER).isBlank(),
-                "Missing DB_USER – integration tests are disabled");
-        Assumptions.assumeTrue(System.getenv(REQUIRED_PASS) != null,
-                "Missing DB_PASSWORD – integration tests are disabled");
+    public void checkEnv() throws Exception {
+        // Ensure integration-test mode is active. The Maven profile sets this flag.
+        Assumptions.assumeTrue(Boolean.parseBoolean(System.getProperty("integration.tests.enabled", "false")),
+                "Integration tests are disabled – missing integration.tests.enabled flag");
+        // Initialise H2 in‑memory schema if not already present.
+        try (var conn = com.cropyield.config.DBConnection.getConnection();
+             var stmt = conn.createStatement()) {
+            // Crop types table
+            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS crop_types (" +
+                    "crop_id INT AUTO_INCREMENT PRIMARY KEY, " +
+                    "crop_name VARCHAR(255) NOT NULL, " +
+                    "assumed_yield_per_hectare DECIMAL(10,2), " +
+                    "active BOOLEAN NOT NULL)");
+            // Seed a default wheat entry if missing
+            stmt.executeUpdate("MERGE INTO crop_types (crop_id, crop_name, assumed_yield_per_hectare, active) KEY(crop_id) " +
+                    "VALUES (1, 'Wheat', 1.5, TRUE)");
+            // Crop records table
+            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS crop_records (" +
+                    "id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
+                    "farmer_name VARCHAR(255), " +
+                    "crop_id INT, " +
+                    "crop_name VARCHAR(255), " +
+                    "land_area DECIMAL(10,2), " +
+                    "rainfall DECIMAL(10,2), " +
+                    "temperature DECIMAL(10,2), " +
+                    "soil_type VARCHAR(255), " +
+                    "fertilizer DECIMAL(10,2), " +
+                    "predicted_yield DECIMAL(10,2), " +
+                    "created_at TIMESTAMP) ");
+        }
     }
 
     @Test

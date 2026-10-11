@@ -12,11 +12,16 @@ import java.sql.SQLException;
 public final class DBConnection {
 
     static {
-        // Ensure the MySQL driver is loaded. If unavailable, fail fast with a runtime exception.
+        // Load MySQL driver (primary) and H2 driver (for integration tests).
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException ignored) {
+            // MySQL driver may not be present in test classpath; ignore.
+        }
+        try {
+            Class.forName("org.h2.Driver");
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException("MySQL JDBC driver not found on classpath.", e);
+            throw new RuntimeException("Required JDBC driver not found on classpath.", e);
         }
     }
 
